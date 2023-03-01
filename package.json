@@ -8,7 +8,11 @@
     "build-n-start": "tsc && node ."
   },
   "dependencies": {
-    "@types/node": "^18.11.9"
+    "@types/node": "^18.11.9",
+    "@types/node-fetch": "^2.6.2",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^3.3.0",
+    "typedi": "^0.10.0"
   },
   "devDependencies": {
     "ts-node": "^10.7.0",
