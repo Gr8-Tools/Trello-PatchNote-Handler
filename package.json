@@ -1,6 +1,6 @@
 {
   "name": "@gr8-tools/trello-patchnote-handler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Provide utility to handle last week cards from specified trello-lists",
   "files" : [
     "/lib",
