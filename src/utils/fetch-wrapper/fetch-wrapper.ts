@@ -1,11 +1,13 @@
 import fetch, {BodyInit, RequestInit} from 'node-fetch'
 
-export class FetchWrapper {
-    private readonly __url : string;
-    private readonly __headers: Record<string, string>;
-    private readonly __queryParams: Map<string, string>;
+export class FetchWrapper<T extends FetchWrapper<T>> {
+    static CONTENT_TYPE_HEADER : string = "Content-Type";
 
-    private __urlExtend : string;
+    protected readonly __url : string;
+    protected readonly __headers: Record<string, string>;
+    protected readonly __queryParams: Map<string, string>;
+
+    protected __urlExtend : string;
 
     constructor(baseUrl : string) {
         this.__url = baseUrl;
@@ -16,52 +18,59 @@ export class FetchWrapper {
     /* Устанавливает заголовок типа данных
     * @param value - значение типа данных
     */
-    setContentType(value: string) : FetchWrapper {
-        return this.setHeader("Content-Type", value);
-    }
-
-    /* Устанавливает данные авторизации в QueryParams
-    * @param apiKey - ключ авторизации
-    * @param token - токен авторизации
-    */
-    setAuth(apiKey: string, token: string) : FetchWrapper {
-        return this
-            .setQueryParam("key", apiKey)
-            .setQueryParam("token",token);
+    setContentType(value: string) : FetchWrapper<T> {
+        return this.setHeader(FetchWrapper.CONTENT_TYPE_HEADER, value);
     }
 
     /* Устанавливает заголовок
     * @param key - ключ заколовка
     * @param value - значение заголовка
     */
-    setHeader(key: string, value: string) : FetchWrapper {
+    setHeader(key: string, value: string) : FetchWrapper<T> {
         this.__headers[key] = value;
+        return this;
+    }
+
+    /* Очищает заголовки запроса
+    */
+    clearHeaders(...excludeKeys: string[]) : FetchWrapper<T> {
+        for (let key in this.__headers){
+            if (excludeKeys.length > 0 && excludeKeys.includes(key)){
+                continue;
+            }
+
+            delete this.__headers[key];
+        }
+
         return this;
     }
 
     /*
     Дополняет урл запроса парами `/${KEY}/${VALUE}`
     */
-    extendUrl(map: Map<string, string>) : FetchWrapper {
-        map.forEach((value, key) => {
-            this.__urlExtend += `/${key}/${value}`;
-        })
+    extendUrl(key: string, value: string) : FetchWrapper<T> {
+        this.__urlExtend += `/${key}/${value}`;
         return this;
     }
 
     /* Add to the end of url string one more part
     * @param urlTail - appended part to url
     */
-    appendToUrl(urlTail: string) : FetchWrapper {
+    appendToUrl(urlTail: string) : FetchWrapper<T> {
         this.__urlExtend += `/${urlTail}`;
         return this;
     }
 
+    /* Очищает дополнение к базовому урлу */
+    clearUrlExtend() : FetchWrapper<T> {
+        this.__urlExtend = "";
+        return this;
+    }
 
     /*
         Добавляет в QueryParams пары `{KEY}={VALUE}`
     */
-    setQueryParams(map: Map<string, string>) : FetchWrapper {
+    setQueryParams(map: Map<string, string>) : FetchWrapper<T> {
         map.forEach((value, key) => {
             this.setQueryParam(key, value);
         })
@@ -71,9 +80,29 @@ export class FetchWrapper {
     /*
         Добавляет в QueryParams пару `{KEY}={VALUE}`
     */
-    setQueryParam(key: string, value: string) : FetchWrapper {
+    setQueryParam(key: string, value: string) : FetchWrapper<T> {
         this.__queryParams.delete(key);
         this.__queryParams.set(key, value);
+        return this;
+    }
+
+    /* Удаляет все записи из QueryParams, кроме тех, что хранятся под ключами из excludeKeys
+    * @param excludeKeys - массив ключей, который НЕ удаляется из QueryParams
+    */
+    clearQueryParam(...excludeKeys: string[]) : FetchWrapper<T> {
+        if(excludeKeys.length > 0) {
+            const keysToRemove = new Array<string>();
+            for (let key of this.__queryParams.keys()) {
+                if (!excludeKeys.includes(key)){
+                    keysToRemove.push(key);
+                }
+            }
+
+            keysToRemove.forEach(k => this.__queryParams.delete(k));
+        } else {
+            this.__queryParams.clear()
+        }
+
         return this;
     }
 

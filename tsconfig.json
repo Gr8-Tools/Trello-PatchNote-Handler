@@ -17,5 +17,5 @@
   },
   "compileOnSave": true,
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "lib", ".secrets"]
+  "exclude": ["node_modules", ".secrets"]
 }
