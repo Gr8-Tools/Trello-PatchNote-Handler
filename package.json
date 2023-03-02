@@ -1,6 +1,15 @@
 {
-  "name": "trello_patchnote_handler",
+  "name": "@gr8-tools/trello-patchnote-handler",
   "version": "1.0.0",
+  "description": "Provide utility to handle last week cards from specified trello-lists",
+  "files" : [
+    "/lib",
+    "/src"
+  ],
+  "publishConfig": {
+     "@gr8-tools:registry": "https://npm.pkg.github.com"
+   },
+
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
@@ -8,7 +17,11 @@
     "build-n-start": "tsc && node ."
   },
   "dependencies": {
-    "@types/node": "^18.11.9"
+    "@types/node-fetch": "^2.6.2",
+    "@types/node": "^18.11.9",
+    "node-fetch": "^2.6.2",
+    "node-cache": "^5.1.2",
+    "typedi": "^0.10.0"
   },
   "devDependencies": {
     "ts-node": "^10.7.0",

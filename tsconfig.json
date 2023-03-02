@@ -1,21 +1,17 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "noImplicitReturns": true,
-    "noUnusedLocals": false,
-    "outDir": "lib",
-    "sourceMap": true,
-    "strict": true,
     "target": "es2017",
-    "resolveJsonModule": true,
+    "declaration": true,
+    "outDir": "lib",
+
+    "noImplicitReturns": true,
+    "strict": true,
     "esModuleInterop": true,
-    "baseUrl": ".",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
 
     "strictPropertyInitialization": false
   },
   "compileOnSave": true,
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "lib", ".secrets"]
+  "include": ["src/**/*"],
+  "exclude": [".secrets"]
 }
