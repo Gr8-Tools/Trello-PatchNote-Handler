@@ -1,7 +1,12 @@
 {
   "name": "@gr8-tools/trello-patchnote-handler",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Provide utility to handle last week cards from specified trello-lists",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gr8-Tools/Trello-PatchNote-Handler.git"
+  },
   "files" : [
     "/lib",
     "/src"
@@ -10,7 +15,6 @@
      "@gr8-tools:registry": "https://npm.pkg.github.com"
    },
 
-  "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
     "start": "node .",

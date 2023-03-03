@@ -107,4 +107,3 @@ dist
 # Custom
 **/.idea/
 **/.secrets/
-**/lib/
