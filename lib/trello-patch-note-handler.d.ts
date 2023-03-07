@@ -6,7 +6,7 @@ export declare class TrelloPatchNoteHandler {
     private readonly __lists;
     constructor(apiKey: string, token: string);
     setLists(...listIds: string[]): Promise<void>;
-    getCards(): Promise<Array<TrelloCardShortInfo>>;
+    getCards(boardId: string, cardsLimit?: number, daysLimit?: number): Promise<Array<TrelloCardShortInfo>>;
     private __prepareGetListsFetchWrapper;
     private __prepareGetCardsFetchWrapper;
     private __clearWrapper;
