@@ -13,24 +13,31 @@ export class TrelloPatchNoteHandlerUtils {
         return result;
     }
 
-    static getLastCards(response: any, listName: string) : Array<TrelloCardShortInfo> {
+    static getLastCards(response: any, listNames: Map<string, TrelloListShortInfo>, daysLimit: number) : Array<TrelloCardShortInfo> {
         const results = new Array<TrelloCardShortInfo>();
-        const dateNow : number = Date.now(), diffDate : number = 1000 * 3600 * 24 * 7;
-        const rawCardsArray : (Array<any>) = response as Array<any>;
+        const dateNow : number = Date.now(), diffDate : number = 1000 * 3600 * 24 * daysLimit;
+
+
+        const rawCardsArray : (Array<any>) = response["cards"] as Array<any>;
 
         for (let rawCardInfo of rawCardsArray) {
             // validate cardInfo by date
-            const cardDate : number = Date.parse(rawCardInfo["dateLastActivity"]);
+            const cardDate : number = Date.parse(rawCardInfo["due"]);
             if (dateNow - cardDate > diffDate){
-                continue;
+                //TODO: расчет на то, что карточки отсортированы, и дальше проверять нет смысла
+                break;
             }
 
+            // replace content from raw object to typed
             const cardInfo: TrelloCardShortInfo = new TrelloCardShortInfo();
 
             Object.keys(rawCardInfo).forEach((key) => {
                 cardInfo.set(key, rawCardInfo[key].toString());
             });
-            cardInfo.set('nameList', listName);
+
+            // extend with 'nameList'
+            const listId = cardInfo.get('idList')!;
+            cardInfo.set('nameList', listNames.get(listId)!.get('name')!);
 
             results.push(cardInfo)
         }

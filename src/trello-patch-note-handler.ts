@@ -35,25 +35,26 @@ export class TrelloPatchNoteHandler {
     }
 
     /* Получает карточки (за прошлую неделю)
+    * @param boardId - Id доски
+    * @param cardsLimit - лимит карточек, которые мы запрашиваем (по умолчанию 100)
+    * @param daysLimit - лимит дней, по которому мы фильтруем карточки (по умолчанию 7 дней назад)
     * */
-    async getCards() : Promise<Array<TrelloCardShortInfo>> {
+    async getCards(boardId: string, cardsLimit: number = 100, daysLimit: number = 7) : Promise<Array<TrelloCardShortInfo>> {
         const result = new Array<TrelloCardShortInfo>;
         if(this.__lists.size == 0){
             return result;
         }
 
-        for(let listId of this.__lists.keys()) {
-            // Подготовили запрос
-            this.__prepareGetCardsFetchWrapper(listId);
+        // Подготовили запрос
+        this.__prepareGetCardsFetchWrapper(boardId, cardsLimit);
 
-            // Получили сырой ответ
-            const responseObject = await this.__client.sendRequest('GET');
+        // Получили сырой ответ
+        const responseObject = await this.__client.sendRequest('GET');
 
-            // Выдернули из сырого ответа нужные данные
-            TrelloPatchNoteHandlerUtils
-                .getLastCards(responseObject, this.__lists.get(listId)!.get('name')!)
-                .forEach(c => result.push(c));
-        }
+        // Выдернули из сырого ответа нужные данные
+        TrelloPatchNoteHandlerUtils
+            .getLastCards(responseObject, this.__lists, daysLimit)
+            .forEach(c => result.push(c));
 
         return result;
     }
@@ -70,17 +71,25 @@ export class TrelloPatchNoteHandler {
             .setQueryParam("fields", "name");
     }
 
-    /* Подготавливает fetchWrapper к получению карточек с листа **listId**
-    * @param listId - ИД листа, с которого мы считываем карточки
+    /* Подготавливает fetchWrapper к получению **limit** ЗАВЕРШЕННЫХ карточек на доске **boardId**
+    * @param boardId - ИД доски, на которой мы ищем карточки
+    * @param limit - максимальное кол-во карточек, которое мы получаем
     * */
-    private __prepareGetCardsFetchWrapper(listId: string) : void {
+    private __prepareGetCardsFetchWrapper(boardId: string, limit: number) : void {
         // очистка
         this.__clearWrapper();
 
         this.__client
-            .extendUrl("lists", listId)
-            .appendToUrl("cards")
-            .setQueryParam("fields", "name,shortUrl,dateLastActivity,idList");
+            .appendToUrl("search")
+            .setQueryParam("query", encodeURIComponent('due:complete sort:-due'))
+            .setQueryParam("idBoards", boardId)
+            .setQueryParam("card_fields", "name,shortUrl,due,dueComplete,idList")
+            .setQueryParam("cards_limit", limit.toString());
+
+        // this.__client
+        //     .extendUrl("lists", listId)
+        //     .appendToUrl("cards")
+        //     .setQueryParam("fields", "name,shortUrl,dateLastActivity,idList");
     }
 
     /* Сбрасывает состояние fetchWrapper'a */
